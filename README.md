@@ -18,9 +18,10 @@
 
 <p align="center">
   <a href="#tong-quan">Tổng quan</a> &middot;
+  <a href="#mo-web">Mở web</a> &middot;
   <a href="#cai-dat">Cài đặt</a> &middot;
+  <a href="#thiet-ke">Thiết kế CSDL</a> &middot;
   <a href="#truy-van-sql">Truy vấn SQL</a> &middot;
-  <a href="#cap-nhat-db">Cập nhật DB</a> &middot;
   <a href="#tai-lieu">Tài liệu</a>
 </p>
 
@@ -44,16 +45,23 @@ nguyên ảnh đã có trong repo.
 > Dữ liệu mẫu thuộc mùa **2025–2026**. Web mặc định mùa **2026–2027**;
 > lịch, kết quả và BXH mùa mới cần token football-data.org của riêng bạn.
 
+<a id="mo-web"></a>
+
+## Mở web khi đã có CSDL
+
+1. Khởi động dịch vụ MySQL. Trên Windows, có thể mở `services.msc` để tìm dịch vụ MySQL của máy.
+2. Từ thư mục gốc của dự án, chạy `.\app\run.bat` trên Windows hoặc `sh app/run.sh` trên macOS/Linux.
+3. Nhập mật khẩu MySQL khi được hỏi. Sau khi terminal in `Giao dien`, mở <http://127.0.0.1:8080> và đăng nhập bằng tài khoản quản trị web. Giữ terminal mở trong lúc sử dụng.
+
 <a id="cai-dat"></a>
 
-## Cài đặt và chạy
+## Cài đặt lần đầu
 
 ### Chuẩn bị
 
 - JDK 17 trở lên: cả `java` và `javac` phải có trong `PATH`.
 - MySQL Server 8.4 trở lên đang chạy; biết tài khoản và mật khẩu MySQL.
 - MySQL CLI hoặc MySQL Workbench để khởi tạo CSDL.
-- Token football-data.org của riêng bạn để tải lịch, kết quả và BXH mùa mới.
 
 ```powershell
 git clone https://github.com/hariet0905/MU-QuanLy.git
@@ -95,13 +103,13 @@ mở cùng một kết nối, lần lượt chạy toàn bộ `db/01_schema.sql`
 Tên DB mặc định là `csdl1_mu_2025_26`; DB này có thể chứa nhiều mùa giải.
 Dữ liệu mẫu thuộc mùa **2025–2026**, phục vụ minh họa nghiệp vụ và truy vấn.
 
-### 02 · Kết nối nguồn bóng đá
+### 02 · Kết nối nguồn bóng đá (tùy chọn)
 
 ```powershell
-Copy-Item .env.example .env
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 ```
 
-Mở `.env` tại thư mục gốc, điền token của bạn sau `FOOTBALL_DATA_API_KEY=`.
+Mở `.env` tại thư mục gốc và điền token sau `FOOTBALL_DATA_API_KEY=`.
 File này bị Git bỏ qua. Có thể dùng biến môi trường cùng tên; biến môi
 trường được ưu tiên. Khởi động lại Java sau khi đổi token.
 
@@ -120,20 +128,13 @@ ESPN không cần token. Thống kê không có trong nguồn được để tr�
 Windows PowerShell:
 
 ```powershell
-.\app\setup-admin.bat
 .\app\run.bat
 ```
 
+Lần đầu, `run.bat` hỏi mật khẩu MySQL rồi mở lời nhắc tạo tài khoản web.
 Tạo tên đăng nhập 3–40 ký tự (chữ, số, `.`, `_`, `-`) và mật khẩu từ 12 ký tự.
-Đây là tài khoản web riêng, không phải tài khoản MySQL. Không có tài khoản
-mặc định; lần chạy đầu cũng tự hỏi nếu chưa tạo. Mật khẩu nhập trong terminal
-không hiển thị ký tự. Sau đó nhập mật khẩu MySQL khi `run.bat` hỏi.
-
-**Mở ứng dụng: <http://127.0.0.1:8080>**
-
-Đăng nhập bằng tài khoản vừa tạo. Giữ terminal
-đang chạy; `Ctrl+C` để dừng. Nếu đang đứng trong thư mục `app`, dùng
-`.\run.bat`, không thêm `app` lần nữa.
+Đăng nhập tại <http://127.0.0.1:8080> bằng tài khoản web vừa tạo. Dùng
+`Ctrl+C` trong terminal để dừng ứng dụng.
 
 macOS/Linux: chạy `sh app/run.sh`; tạo quản trị viên qua lời nhắc lần đầu.
 
@@ -160,20 +161,19 @@ trong URL truy cập. **Các biến DB và PORT không được đọc từ `.en
 
 ---
 
+<a id="thiet-ke"></a>
+
+## Thiết kế CSDL
+
+[Sơ đồ ER chính thức](resources/design/er.png) xác định các thực thể và liên kết nghiệp vụ. [Schema MySQL](db/01_schema.sql) triển khai 11 bảng, khóa và ràng buộc. Một vị trí chính có thể được nhiều cầu thủ sử dụng, mỗi cầu thủ có một vị trí chính.
+
+Khi phát triển tính năng, giữ nguyên các liên kết, lực lượng, khóa và ràng buộc. Hợp đồng, đăng ký và lần ra sân phải giữ lịch sử theo đúng cầu thủ, CLB và thời điểm. Chỉ đổi thiết kế khi có yêu cầu rõ ràng và cập nhật đồng bộ ER, schema, mã và tài liệu.
+
 <a id="truy-van-sql"></a>
 
 ## Truy vấn trực tiếp trong MySQL
 
-> [!TIP]
-> Mở `db/05_reports.sql` trong Workbench để xem đủ 15 báo cáo.
-> Không cần chạy web hoặc có token API.
-
-**`db/05_reports.sql` là bộ truy vấn của ứng dụng, cần giữ khi clone.**
-File chứa 15 câu `SELECT`, không phải file tạm sinh ra để kiểm thử.
-Câu SQL nằm trong repo; dữ liệu nguồn nằm trong 11 bảng MySQL. Chạy truy vấn
-sẽ tính kết quả từ dữ liệu hiện có, không tạo sẵn 15 bảng hay view báo cáo.
-
-Sau khi khởi tạo DB, mở và chạy `db/05_reports.sql` trong Workbench, hoặc:
+Chạy [15 truy vấn của ứng dụng](db/05_reports.sql) trong Workbench hoặc MySQL CLI. Các truy vấn chỉ đọc dữ liệu.
 
 ```powershell
 mysql --loose-commands --default-character-set=utf8mb4 -u root -p --execute="SOURCE db/05_reports.sql;"
@@ -212,17 +212,13 @@ một lần trước; DB tạo mới đã có cột này.
 
 | Đường dẫn | Nội dung |
 | --- | --- |
-| `app/` | Mã Java, script chạy, JDBC driver |
-| `app/web/` | Giao diện, ảnh, logo, cờ và ghi nguồn ảnh |
-| `db/` | Schema, trigger, procedure, seed, Q01–Q15 và migration |
-| `resources/readme/` | Badge SVG dùng trong trang giới thiệu |
-| `resources/design/` | ER hiện hành và ảnh đối chiếu |
-| `resources/references/` | Yêu cầu bài tập, tài liệu Word |
-
-ER hiện hành: [sơ đồ đã xác nhận](resources/design/899730302_906908339083363_4183998577844837985_n.png).
-`resources/design/image.png` là bản cũ để đối chiếu.
-Nguồn ảnh: [photo-credits.html](app/web/photo-credits.html).
-Giấy phép thư viện nằm trong `app/lib/`.
+| [app/](app/) | Mã Java, script chạy và JDBC driver |
+| [app/web/](app/web/) | Giao diện và tài nguyên hình ảnh |
+| [submission.sql](submission.sql), [db/](db/) | Khởi tạo MySQL, schema, trigger, thủ tục, seed, báo cáo và migration |
+| [resources/design/](resources/design/) | ER chính thức và ảnh mô hình bảng tham khảo |
+| [resources/references/](resources/references/) | Yêu cầu bài tập và báo cáo Word |
+| [report-db.md](report-db.md) | Quy tắc dữ liệu và nội dung Q01–Q15 |
+| [Nguồn ảnh](app/web/photo-credits.html), [giấy phép thư viện](app/lib/) | Ghi công và giấy phép tài nguyên |
 
 Repo không chứa mật khẩu, token, tài khoản quản trị hoặc bản sao DB đang
 chạy trên máy người phát triển. Mỗi máy clone tự khởi tạo và cấu hình riêng.
