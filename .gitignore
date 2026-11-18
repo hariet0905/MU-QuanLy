@@ -6,6 +6,7 @@
 !.env.sample
 *.log
 /app/build/
+/app/tests/
 /app/.football-data-bindings.properties*
 /app/.admin.properties*
 /resources/local-backups/

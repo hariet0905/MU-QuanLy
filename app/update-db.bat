@@ -6,7 +6,7 @@ if not "%~1"=="" if not "%~1"=="--check" if not "%~1"=="--apply" (
   exit /b 1
 )
 if not exist build mkdir build
-javac --release 17 -encoding UTF-8 --class-path "lib/*" -d build UpdateDatabase.java DbWriteRules.java
+javac --release 17 -encoding UTF-8 --class-path "lib/*" --source-path "src/main/java" -d build "src/main/java/UpdateDatabase.java"
 if errorlevel 1 exit /b 1
 echo Dung run.bat / Java server truoc khi cap nhat DB.
 echo Cap nhat guard 002/003 phu hop; chi doi trigger/procedure, khong khoi tao lai CSDL.

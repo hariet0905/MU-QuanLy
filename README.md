@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <img src="resources/readme/java.svg" alt="Java 17 trở lên">
-  <img src="resources/readme/mysql.svg" alt="MySQL 8.4 trở lên">
-  <img src="resources/readme/frontend.svg" alt="HTML, CSS, JavaScript">
-  <img src="resources/readme/reports.svg" alt="15 truy vấn báo cáo">
+  <img src="docs/assets/java.svg" alt="Java 17 trở lên">
+  <img src="docs/assets/mysql.svg" alt="MySQL 8.4 trở lên">
+  <img src="docs/assets/frontend.svg" alt="HTML, CSS, JavaScript">
+  <img src="docs/assets/reports.svg" alt="15 truy vấn báo cáo">
 </p>
 
 <p align="center">
@@ -165,7 +165,7 @@ trong URL truy cập. **Các biến DB và PORT không được đọc từ `.en
 
 ## Thiết kế CSDL
 
-[Sơ đồ ER chính thức](resources/design/er.png) xác định các thực thể và liên kết nghiệp vụ. [Schema MySQL](db/01_schema.sql) triển khai 11 bảng, khóa và ràng buộc. Một vị trí chính có thể được nhiều cầu thủ sử dụng, mỗi cầu thủ có một vị trí chính.
+[Sơ đồ ER chính thức](docs/design/er.png) xác định các thực thể và liên kết nghiệp vụ. [Schema MySQL](db/01_schema.sql) triển khai 11 bảng, khóa và ràng buộc. Một vị trí chính có thể được nhiều cầu thủ sử dụng, mỗi cầu thủ có một vị trí chính.
 
 Khi phát triển tính năng, giữ nguyên các liên kết, lực lượng, khóa và ràng buộc. Hợp đồng, đăng ký và lần ra sân phải giữ lịch sử theo đúng cầu thủ, CLB và thời điểm. Chỉ đổi thiết kế khi có yêu cầu rõ ràng và cập nhật đồng bộ ER, schema, mã và tài liệu.
 
@@ -212,11 +212,12 @@ một lần trước; DB tạo mới đã có cột này.
 
 | Đường dẫn | Nội dung |
 | --- | --- |
-| [app/](app/) | Mã Java, script chạy và JDBC driver |
+| [app/](app/) | Script chạy và JDBC driver |
+| [app/src/main/java/](app/src/main/java/) | Mã nguồn backend Java |
 | [app/web/](app/web/) | Giao diện và tài nguyên hình ảnh |
 | [submission.sql](submission.sql), [db/](db/) | Khởi tạo MySQL, schema, trigger, thủ tục, seed, báo cáo và migration |
-| [resources/design/](resources/design/) | ER chính thức và ảnh mô hình bảng tham khảo |
-| [resources/references/](resources/references/) | Yêu cầu bài tập và báo cáo Word |
+| [docs/design/](docs/design/) | ER chính thức và ảnh mô hình bảng tham khảo |
+| [docs/references/](docs/references/) | Yêu cầu bài tập và báo cáo Word |
 | [report-db.md](report-db.md) | Quy tắc dữ liệu và nội dung Q01–Q15 |
 | [Nguồn ảnh](app/web/photo-credits.html), [giấy phép thư viện](app/lib/) | Ghi công và giấy phép tài nguyên |
 
